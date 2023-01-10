@@ -37,21 +37,7 @@ void init_C1_kernel(float *data, int size) {
     }
 }
 
-void MatrixPrint(float *M, int n, int p){
-    printf("[");
-    for (int row=0; row<n; row++)
-    {
-        for(int col=0; col<p; col++)
-        {
-            if (row==n-1 & col==p-1){
-                printf("%f]", M[row*p+col]);
-            }else{
-                printf("%f    ", M[row*p+col]);
-            }
-        }
-        printf("\n");
-    }
-}
+
 
 void conv2d(float *input, float *filter, int input_width, int input_height, int filter_width, int filter_height, float *output)
 {
@@ -95,27 +81,19 @@ __device__ float activation_tanh(float M) {
     return tanhf(M);
 }
 
+__global__ void cudaMatrixMultGeneral(float *M1, float *M2, float *Mout, int n, int p, int m){
 
-int main() {
+    int lig = blockIdx.y * blockDim.y + threadIdx.y;
+    int col = blockIdx.x * blockDim.x + threadIdx.x;
 
-    float raw_data[32*32];
-    float C1_data[6*28*28];
-    float S1_data[6*14*14];
-    float C1_kernel[6*5*5];
+    float s = 0.0f;
 
-
-    // initialisation des matrices
-    init_raw_data(raw_data, 32*32);
-    init_C1_data(C1_data, 6*28*28);
-    init_S1_data(S1_data, 6*14*14);
-    init_C1_kernel(C1_kernel, 6*5*5);
-
-    // utilisation des matrices
-
-    conv2d(raw_data, C1_kernel, 32, 32, 5, 5, C1_data);
-    MatrixPrint(C1_data, 28,28);
-
-    sub_sampling_2D(C1_data,28,28,S1_data);
-    MatrixPrint(S1_data,14,14);
-    return 0;
+    if (lig < n && col < m){
+        for (int i = 0; i < p; i++){
+            s += M1[lig * p + i] * M2[i * m + col];
+        }
+        Mout[lig * m + col] = s;
+    }
 }
+
+

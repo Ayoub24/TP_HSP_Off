@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <time.h>
+#include "part2.cu"
 
 void MatrixInit(float *M, int n, int p) {
     for(int i = 0; i < p; i++) {
@@ -78,15 +79,22 @@ __global__ void cudaMatrixMult(float *M1, float *M2, float *Mout, int n) {
     Mout[row * n + col] = result;
 }
 
+__global__ void cudaDense(float* d_M, float* d_Mout, float* d_W, float* d_b, int n, int p, int m) {
+
+    d_Mout = cudaMatrixMultGeneral(d_M, d_W, d_Mout, n, p, m);
+    cudaMatrixAdd(d_Mout, d_b, d_Mout, n, m);
+}
+
+
 
 
 int main() {
     double CPUtime = 0;
-
-    clock_t start, end;
     double GPUtime = 0;
-    int n = 2000;
-    int p = 2000;
+    clock_t start, end;
+
+    int n = 5000;
+    int p = 5000;
     float *M1;
     float *M2;
     float *M3;
@@ -150,7 +158,7 @@ int main() {
     end = clock();
 
     GPUtime = (double)(end-start)/CLOCKS_PER_SEC;
-    printf("\n\nGPU time : %f\n", GPUtime);
+    printf("\n\nGPU time : %f\n\n\n", GPUtime);
 
     free(M1);
     free(M2);
@@ -159,6 +167,35 @@ int main() {
     cudaFree(cM1);
     cudaFree(cM2);
     cudaFree(cM3);
+
+
+    float raw_data[32*32];
+    float C1_data[6*28*28];
+    float S1_data[6*14*14];
+    float C1_kernel[6*5*5];
+
+
+    // initialisation des matrices
+    init_raw_data(raw_data, 32*32);
+    init_C1_data(C1_data, 6*28*28);
+    init_S1_data(S1_data, 6*14*14);
+    init_C1_kernel(C1_kernel, 6*5*5);
+
+    // utilisation des matrices
+
+    conv2d(raw_data, C1_kernel, 32, 32, 5, 5, C1_data);
+    MatrixPrint(C1_data, 28,28);
+
+    sub_sampling_2D(C1_data,28,28,S1_data);
+    MatrixPrint(S1_data,14,14);
+
+    FILE *fptr;
+
+    if((fptr = fopen("/users/ayoumabr93/CLionProjects/TP_HSP/weights.dat","rb")) == NULL){
+        printf("Can't open file");
+        exit(1);
+    }
+
 
     return 0;
 }
