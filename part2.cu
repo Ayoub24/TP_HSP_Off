@@ -1,67 +1,121 @@
+//
+// Created by ayoumabr93 on 12/12/22.
+//
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
+#include <cassert>
 
-#define ROWS 32
-#define COLS 32
-#define C1_KERNEL_ROWS 5
-#define C1_KERNEL_COLS 5
-#define S1_ROWS 6
-#define S1_COLS 14
-#define C1_ROWS 28
-#define C1_COLS 28
 
-void convolution2D(float **image, float **filter, float **result, int image_rows, int image_cols, int filter_rows, int filter_cols) {
-    int filter_mid_rows = (int)filter_rows / 2;
-    int filter_mid_cols = (int)filter_cols / 2;
+// déclaration des matrices
+float raw_data[32*32];
+float C1_data[6*28*28];
+float S1_data[6*14*14];
+float C1_kernel[6*5*5];
 
-    for (int i = filter_mid_rows; i < image_rows - filter_mid_rows; ++i) {
-        for (int j = filter_mid_cols; j < image_cols - filter_mid_cols; ++j) {
-            int sum = 0;
+// fonction d'initialisation des matrices
+void init_raw_data(float *data, int size) {
+    for (int i = 0; i < size; ++i) {
+        data[i] = rand() / (float)RAND_MAX;
+    }
+}
 
-            for (int m = 0; m < filter_rows; ++m) {
-                for (int n = 0; n < filter_cols; ++n) {
-                    sum += image[i - filter_mid_rows + m][j - filter_mid_cols + n] * filter[m][n];
+void init_C1_data(float *data, int size) {
+    for (int i = 0; i < size; ++i) {
+        data[i] = 0;
+    }
+}
+
+void init_S1_data(float *data, int size) {
+    for (int i = 0; i < size; ++i) {
+        data[i] = 0;
+    }
+}
+
+void init_C1_kernel(float *data, int size) {
+    for (int i = 0; i < size; ++i) {
+        data[i] = rand() / (float)RAND_MAX;
+    }
+}
+
+void MatrixPrint(float *M, int n, int p){
+    printf("[");
+    for (int row=0; row<n; row++)
+    {
+        for(int col=0; col<p; col++)
+        {
+            if (row==n-1 & col==p-1){
+                printf("%f]", M[row*p+col]);
+            }else{
+                printf("%f    ", M[row*p+col]);
+            }
+        }
+        printf("\n");
+    }
+}
+
+void conv2d(float *input, float *filter, int input_width, int input_height, int filter_width, int filter_height, float *output)
+{
+    int output_width = input_width - filter_width + 1;
+    int output_height = input_height - filter_height + 1;
+
+    // boucle pour parcourir chaque pixel de l'image d'entrée
+    for (int i = 0; i < output_height; i++)
+    {
+        for (int j = 0; j < output_width; j++)
+        {
+            // initialisation de la valeur de sortie à 0
+            output[i * output_width + j] = 0;
+
+            // boucle pour appliquer le filtre à chaque pixel de l'image
+            for (int k = 0; k < filter_height; k++)
+            {
+                for (int l = 0; l < filter_width; l++)
+                {
+                    // calcul de la convolution en multipliant chaque élément du filtre par la valeur correspondante de l'image d'entrée et en les additionnant
+                    output[i * output_width + j] += filter[k * filter_width + l] * input[(i + k) * input_width + (j + l)];
                 }
             }
-
-            result[i][j] = sum;
         }
     }
 }
 
+void sub_sampling_2D(float* input, int rows, int cols, float* output) {
+    // Vérifier que les tailles de l'entrée et de la sortie sont correctes
+    assert(rows % 2 == 0 && cols % 2 == 0);
+
+    // Échantillonner l'entrée pour générer la sortie
+    for (int i = 0; i < rows; i += 2) {
+        for (int j = 0; j < cols; j += 2) {
+            output[(i / 2)*(cols/2)+j / 2] = (input[i * cols + j] + input[i * cols + j + 1] + input[(i + 1) * cols + j] + input[(i + 1) * cols + j + 1]) / 4.0;
+        }
+    }
+}
+
+__device__ float activation_tanh(float M) {
+    return tanhf(M);
+}
+
+
 int main() {
-    // Génération de la matrice raw_data
-    /*float* raw_data[ROWS][COLS];
-    srand(time(NULL));
-    for (int i = 0; i < ROWS; i++) {
-        for (int j = 0; j < COLS; j++) {
-            raw_data[i][j] = (float) rand() / (float) (RAND_MAX);
-        }
-    }
 
-    // Génération de la matrice C1_kernel
-    float* C1_kernel[C1_KERNEL_ROWS][C1_KERNEL_COLS];
-    srand(time(NULL));
-    for (int i = 0; i < C1_KERNEL_ROWS; i++) {
-        for (int j = 0; j < C1_KERNEL_COLS; j++) {
-            C1_kernel[i][j] = (float) rand() / (float) (RAND_MAX);
-        }
-    }
+    float raw_data[32*32];
+    float C1_data[6*28*28];
+    float S1_data[6*14*14];
+    float C1_kernel[6*5*5];
 
-    // Génération des matrices C1_data et S1_data
-    float* C1_data[C1_ROWS][C1_COLS];
-    float* S1_data[S1_ROWS][S1_COLS];
-    for (int i = 0; i < C1_ROWS; i++) {
-        for (int j = 0; j < C1_COLS; j++) {
-            C1_data[i][j] = 0;
-        }
-    }
-    for (int i = 0; i < S1_ROWS; i++) {
-        for (int j = 0; j < S1_COLS; j++) {
-            S1_data[i][j] = 0;
-        }
-    }
 
-    convolution2D(raw_data,C1_kernel,C1_data,ROWS,COLS,5,5);*/
+    // initialisation des matrices
+    init_raw_data(raw_data, 32*32);
+    init_C1_data(C1_data, 6*28*28);
+    init_S1_data(S1_data, 6*14*14);
+    init_C1_kernel(C1_kernel, 6*5*5);
+
+    // utilisation des matrices
+
+    conv2d(raw_data, C1_kernel, 32, 32, 5, 5, C1_data);
+    MatrixPrint(C1_data, 28,28);
+
+    sub_sampling_2D(C1_data,28,28,S1_data);
+    MatrixPrint(S1_data,14,14);
+    return 0;
 }
