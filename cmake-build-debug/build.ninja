@@ -49,8 +49,8 @@ cmake_ninja_workdir = /users/ayoumabr93/CLionProjects/TP_HSP/cmake-build-debug/
 
 build cmake_object_order_depends_target_TP_HSP: phony || CMakeFiles/TP_HSP.dir
 
-build CMakeFiles/TP_HSP.dir/ChatGPT_Part2.cu.o: CUDA_COMPILER__TP_HSP_Debug /users/ayoumabr93/CLionProjects/TP_HSP/ChatGPT_Part2.cu || cmake_object_order_depends_target_TP_HSP
-  DEP_FILE = CMakeFiles/TP_HSP.dir/ChatGPT_Part2.cu.o.d
+build CMakeFiles/TP_HSP.dir/part1.cu.o: CUDA_COMPILER__TP_HSP_Debug /users/ayoumabr93/CLionProjects/TP_HSP/part1.cu || cmake_object_order_depends_target_TP_HSP
+  DEP_FILE = CMakeFiles/TP_HSP.dir/part1.cu.o.d
   FLAGS = -g --generate-code=arch=compute_30,code=[compute_30,sm_30]
   OBJECT_DIR = CMakeFiles/TP_HSP.dir
   OBJECT_FILE_DIR = CMakeFiles/TP_HSP.dir
@@ -63,7 +63,7 @@ build CMakeFiles/TP_HSP.dir/ChatGPT_Part2.cu.o: CUDA_COMPILER__TP_HSP_Debug /use
 #############################################
 # Link the executable CMakeFiles/TP_HSP.dir/cmake_device_link.o
 
-build CMakeFiles/TP_HSP.dir/cmake_device_link.o: CUDA_EXECUTABLE_DEVICE_LINKER__TP_HSP_Debug CMakeFiles/TP_HSP.dir/ChatGPT_Part2.cu.o
+build CMakeFiles/TP_HSP.dir/cmake_device_link.o: CUDA_EXECUTABLE_DEVICE_LINKER__TP_HSP_Debug CMakeFiles/TP_HSP.dir/part1.cu.o
   LANGUAGE_COMPILE_FLAGS = -g --generate-code=arch=compute_30,code=[compute_30,sm_30]
   LINK_LIBRARIES = -lcudadevrt -lcudart_static -lrt -lpthread -ldl
   OBJECT_DIR = CMakeFiles/TP_HSP.dir
@@ -76,7 +76,7 @@ build CMakeFiles/TP_HSP.dir/cmake_device_link.o: CUDA_EXECUTABLE_DEVICE_LINKER__
 #############################################
 # Link the executable TP_HSP
 
-build TP_HSP: CUDA_EXECUTABLE_LINKER__TP_HSP_Debug CMakeFiles/TP_HSP.dir/ChatGPT_Part2.cu.o CMakeFiles/TP_HSP.dir/cmake_device_link.o
+build TP_HSP: CUDA_EXECUTABLE_LINKER__TP_HSP_Debug CMakeFiles/TP_HSP.dir/part1.cu.o CMakeFiles/TP_HSP.dir/cmake_device_link.o
   FLAGS = -g --generate-code=arch=compute_30,code=[compute_30,sm_30]
   LINK_LIBRARIES = -lcudadevrt  -lcudart_static  -lrt  -lpthread  -ldl
   OBJECT_DIR = CMakeFiles/TP_HSP.dir
