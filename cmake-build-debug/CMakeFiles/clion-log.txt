@@ -1,10 +1,4 @@
 /users/ayoumabr93/clion/clion-2022.2.4/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=/users/ayoumabr93/clion/clion-2022.2.4/bin/ninja/linux/ninja -G Ninja -S /users/ayoumabr93/CLionProjects/TP_HSP -B /users/ayoumabr93/CLionProjects/TP_HSP/cmake-build-debug
--- The CUDA compiler identification is NVIDIA 10.1.243
--- Detecting CUDA compiler ABI info
--- Detecting CUDA compiler ABI info - done
--- Check for working CUDA compiler: /usr/bin/nvcc - skipped
--- Detecting CUDA compile features
--- Detecting CUDA compile features - done
 -- Configuring done
 -- Generating done
 -- Build files have been written to: /users/ayoumabr93/CLionProjects/TP_HSP/cmake-build-debug

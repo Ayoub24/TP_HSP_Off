@@ -3,7 +3,7 @@ project(TP_HSP CUDA)
 
 set(CMAKE_CUDA_STANDARD 14)
 
-add_executable(TP_HSP main.cu)
+add_executable(TP_HSP ChatGPT_Part2.cu)
 
 set_target_properties(TP_HSP PROPERTIES
         CUDA_SEPARABLE_COMPILATION ON)
